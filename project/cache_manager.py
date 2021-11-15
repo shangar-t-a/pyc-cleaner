@@ -6,23 +6,22 @@ from dataclasses import dataclass
 class CacheRemover:
     """Remove all cache files of the specified directory"""
 
-    def __init__(self, root_dir) -> None:
+    def __init__(self) -> None:
         """Contructor for CacheRemover"""
         
-        self.files = []
-        self.folders = []
-        self.root_dir = os.path.join(root_dir, '**')
-
+        self.cache_files = []
+        self.cache_folders = []
+        
     def removecache(self) -> None:
         """Remove all cache from root folder"""
         
-        self._collect_cache_files()
         self._removeall_cachefiles()
         self._removeall_cachefolders()
 
-    def _collect_cache_files(self) -> None:
+    def collect_cache_files(self, root_dir) -> None:
         """Collect all files and folders from root directory"""
 
+        self.root_dir = os.path.join(root_dir, '**')
         self.cache_files = glob.glob(os.path.join(self.root_dir, '*.pyc'), recursive=True)
         self.cache_files = sorted(list(set(self.cache_files)))
         self.cache_folders = self._get_cache_folders(cachefiles=self.cache_files)
@@ -62,14 +61,8 @@ class CacheRemover:
                 os.rmdir(folder)
 
         if cache:
-            print('Cache Files Removed:')
+            print('Cache Folders Removed:')
             for folder in cache:
                 print(folder)
         else:
             print('No cache folders found')
-            
-
-path = 'F:\\My_Projects\\Python\\Design pattern\\Plugin Architecture\\**'
-
-cache_remover = CacheRemover(root_dir = path)
-cache_remover.removecache()
