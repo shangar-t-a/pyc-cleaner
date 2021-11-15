@@ -23,7 +23,7 @@ class CacheRemover:
 
         self.root_dir = os.path.join(root_dir, '**')
         self.cache_files = glob.glob(os.path.join(self.root_dir, '*.pyc'), recursive=True)
-        self.cache_files = sorted(list(set(self.cache_files)))
+        self.cache_files = [os.path.abspath(file) for file in sorted(list(set(self.cache_files)))]
         self.cache_folders = self._get_cache_folders(cachefiles=self.cache_files)
 
     def _get_cache_folders(self, cachefiles: list) -> list:
