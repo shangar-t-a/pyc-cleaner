@@ -1,4 +1,5 @@
 import sys
+import os
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
 from PyQt5.uic import loadUi
@@ -14,7 +15,10 @@ class MainWindow(QDialog):
 
         super(MainWindow,self).__init__()
 
+        self.cache_cleaner = CacheRemover()
+
         loadUi('gui.ui', self)
+
         self._enable_disable_widgets()
         self._bind_widgets_functions()
 
@@ -28,6 +32,7 @@ class MainWindow(QDialog):
         """Bind all the widgets to the corresponding methods"""
 
         self.browse_root.clicked.connect(self._browsefiles)
+        self.collect_cache.clicked.connect(self._collect_cache)
         self.backup.stateChanged.connect(self._enablebackup)
 
     def _browsefiles(self):
@@ -35,6 +40,16 @@ class MainWindow(QDialog):
 
         fname = str(QFileDialog.getExistingDirectory(self, 'Open folder', 'C:'))
         self.filename_root.setText(fname)
+
+    def _collect_cache(self):
+        """Collect all files of the selectd directory"""
+
+        selected_folder = self.filename_root.text()
+        if os.path.isdir(selected_folder):
+            self.cache_display.setText('')
+            self.cache_cleaner.collect_cache_files(root_dir=selected_folder)
+            self.cache_count.setText(str(len(self.cache_cleaner.cache_files)))
+            self.cache_display.setText('\n'.join(self.cache_cleaner.cache_files))
 
     def _enablebackup(self, checked):
         """Enable widgets tp backup cache files"""
