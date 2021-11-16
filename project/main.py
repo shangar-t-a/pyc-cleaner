@@ -1,7 +1,9 @@
 import sys
 import os
 import traceback
+import ctypes
 from PyQt5 import QtWidgets
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
 from PyQt5.uic import loadUi
 
@@ -92,10 +94,15 @@ class MainWindow(QDialog):
 
 
 if __name__ == '__main__':
+    myappid = 'mycompany.myproduct.subproduct.version' # arbitrary string
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
     app = QApplication(sys.argv)
     mainwindow = MainWindow()
     widget = QtWidgets.QStackedWidget()
     widget.addWidget(mainwindow)
+    widget.setWindowTitle('PyCacheCleaner')
+    widget.setWindowIcon(QIcon('logo.png'))
     widget.setFixedWidth(500)
     widget.setFixedHeight(600)
     widget.show()
