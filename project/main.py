@@ -2,6 +2,7 @@ import sys
 import os
 import traceback
 import ctypes
+import shutil
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
@@ -38,6 +39,7 @@ class MainWindow(QDialog):
         self.collect_cache.clicked.connect(self._collect_cache)
         self.backup.stateChanged.connect(self._enablebackup)
         self.clear_cache.clicked.connect(self._removecache)
+        self.browse_back.clicked.connect(self._browsebackfiles)
 
     def _browsefiles(self):
         """Bind browse_root button to Folder browser"""
@@ -47,6 +49,12 @@ class MainWindow(QDialog):
         self.cache_display.setText('')
         self.cache_count.setText('')
         self.output_message.setText('')
+
+    def _browsebackfiles(self):
+        """Bind browse_root button to backup Folder browser"""
+
+        fname = str(QFileDialog.getExistingDirectory(self, 'Open folder', 'C:'))
+        self.filename_back.setText(fname)
 
     def _collect_cache(self):
         """Collect all files of the selectd directory"""
@@ -70,17 +78,27 @@ class MainWindow(QDialog):
     def _removecache(self) -> None:
         """Remove all available cache files"""
 
+        if self.backup.isChecked() and self.cache_cleaner.cache_files:
+            try:
+                folder = self.filename_back.text()
+                for file in self.cache_cleaner.cache_files:
+                    shutil.copy2(file, folder)
+            except:
+                self.output_message.append(traceback.format_exc())
+            else:
+                self.output_message.append('Successfully copied files to selected destination...')
+
         if self.cache_cleaner.cache_files:
             try:
                 self.cache_cleaner.removecache()
             except:
-                self.output_message.setText(traceback.format_exc())
+                self.output_message.append(traceback.format_exc())
             else:
                 self.cache_display.setText('')
                 self.cache_count.setText('')
-                self.output_message.setText('Successfully removed all cache files...')
+                self.output_message.append('Successfully removed all cache files...')
         else:
-            self.output_message.setText('No Cache to remove...')
+            self.output_message.append('No Cache to remove...')
 
     def _enablebackup(self, checked):
         """Enable widgets tp backup cache files"""
@@ -89,6 +107,7 @@ class MainWindow(QDialog):
             self.filename_back.setEnabled(True)
             self.browse_back.setEnabled(True)
         else:
+            self.filename_back.setText('')
             self.filename_back.setEnabled(False)
             self.browse_back.setEnabled(False)
 
