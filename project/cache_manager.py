@@ -11,12 +11,19 @@ class CacheRemover:
         
         self.cache_files = []
         self.cache_folders = []
+
+    def _reinitialize_data(self) -> None:
+        """Reinitialize cache data"""
+
+        self.cache_files = []
+        self.cache_folders = []
         
     def removecache(self) -> None:
         """Remove all cache from root folder"""
         
         self._removeall_cachefiles()
         self._removeall_cachefolders()
+        self._reinitialize_data()
 
     def collect_cache_files(self, root_dir) -> None:
         """Collect all files and folders from root directory"""
